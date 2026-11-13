@@ -1,0 +1,1069 @@
+{
+  "name": "Oveza - Daily Global Lead Gen + Cold Email + Notify",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "f89c0693-527c-4493-a414-f7f5feddca2c",
+      "name": "Schedule 7AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -784,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0e7c965f-757f-40a3-8512-b8134b889ce1",
+              "name": "searchTargets",
+              "value": "auto repair shop Houston Texas~us~en|auto repair shop Toronto~ca~en|auto repair shop Sydney~au~en|taller mecánico Madrid~es~es|garage automobile Paris~fr~fr|auto repair garage Mumbai~in~en|car dealership Phoenix Arizona~us~en|car dealership Calgary~ca~en|car dealership Melbourne~au~en|concesionario de coches Barcelona~es~es|concession automobile Lyon~fr~fr|car dealership Delhi~in~en|hair salon Los Angeles~us~en|beauty salon Vancouver~ca~en|hair salon Brisbane~au~en|peluquería Valencia~es~es|salon de coiffure Marseille~fr~fr|beauty salon Bangalore~in~en|dental clinic Chicago~us~en|dental clinic Montreal~ca~en|dental clinic Perth~au~en|clínica dental Sevilla~es~es|cabinet dentaire Toulouse~fr~fr|dental clinic Hyderabad~in~en|real estate agency Miami~us~en|real estate agency Ottawa~ca~en|real estate agency Adelaide~au~en|inmobiliaria Málaga~es~es|agence immobilière Nice~fr~fr|real estate agency Pune~in~en|law firm Atlanta~us~en|accounting firm Edmonton~ca~en|accounting firm Gold Coast~au~en|gestoría Bilbao~es~es|cabinet comptable Bordeaux~fr~fr|chartered accountant firm Chennai~in~en",
+              "type": "string"
+            },
+            {
+              "id": "8f561542-90ac-4360-a45a-345ed873114d",
+              "name": "searchesPerDay",
+              "value": 3,
+              "type": "number"
+            },
+            {
+              "id": "26a74c9c-0f3d-477b-ae9f-a4ac2db84783",
+              "name": "maxLeadsPerDay",
+              "value": 10,
+              "type": "number"
+            },
+            {
+              "id": "11e84553-103f-48b9-838a-dd55182fc0c8",
+              "name": "yourName",
+              "value": "Amarachi",
+              "type": "string"
+            },
+            {
+              "id": "4310b746-981d-412c-9ea2-a6baa855b728",
+              "name": "yourCompany",
+              "value": "Orvexa",
+              "type": "string"
+            },
+            {
+              "id": "fbdd448f-0acf-429a-ab4f-26f6d65981bb",
+              "name": "yourOffer",
+              "value": "Orvexa builds AI automations for businesses: automatic booking and appointment reminders, instant replies to customer enquiries, lead follow-up, invoicing and reporting, so your team spends less time on repetitive admin.",
+              "type": "string"
+            },
+            {
+              "id": "abb5b756-dd34-444c-be15-cab28da752ac",
+              "name": "notifyEmail",
+              "value": "amarachiconfidence75@gmail.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "25e80594-26e9-4d2a-976b-cb4420a2a188",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://google.serper.dev/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (() => { const list = $json.searchTargets.split('|').map(s => s.trim()).filter(Boolean); const n = Number($json.searchesPerDay) || 3; const out = []; for (let k = 0; k < n; k++) { const idx = $now.ordinal * n + k; const parts = list[idx % list.length].split('~'); out.push({ q: parts[0], gl: parts[1], hl: parts[2], num: 10, page: (Math.floor(idx / list.length) % 3) + 1 }); } return JSON.stringify(out); })() }}",
+        "options": {}
+      },
+      "id": "33eb181d-75f5-48f9-a8c8-f96853002895",
+      "name": "Search Web (Serper)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -336,
+        1872
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "NUpymxdVqgo6fGs4",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const blocked = ['linkedin.com','facebook.com','instagram.com','twitter.com','x.com','youtube.com','yelp.com','yellowpages.com','yellowpages.ca','trustpilot.com','tripadvisor.com','justdial.com','sulekha.com','indiamart.com','practo.com','99acres.com','magicbricks.com','autotrader.com','cars.com','cargurus.com','carsales.com.au','truelocal.com.au','realestate.com.au','domain.com.au','zillow.com','realtor.com','redfin.com','houzz.com','booksy.com','fresha.com','treatwell.com','pagesjaunes.fr','paginasamarillas.es','doctolib.fr','topdoctors.es','idealista.com','fotocasa.es','seloger.com','kijiji.ca','avvo.com','findlaw.com','lawyers.com','healthgrades.com','birdeye.com','angi.com','thumbtack.com','bbb.org','mapquest.com','wikipedia.org','tiktok.com','pinterest.com','reddit.com','glassdoor.com','indeed.com','clutch.co','crunchbase.com','medium.com','quora.com','forbes.com','amazon.com','google.com'];\nconst langMap = { es: 'Spanish', fr: 'French' };\nconst seen = new Set();\nconst out = [];\nfor (const item of $input.all()) {\n  const res = item.json || {};\n  const sp = res.searchParameters || {};\n  const organic = res.organic || [];\n  for (const r of organic) {\n    let host;\n    const m = String(r.link || '').match(/^https?:\\/\\/([^\\/?#:]+)/i);\n    if (!m) continue;\n    host = m[1].replace(/^www\\./, '').toLowerCase();\n    if (host.endsWith('.ng')) continue;                      // exclude Nigeria\n    if (/\\.(gov|edu)(\\.[a-z]{2})?$/.test(host) || host.includes('.gouv.')) continue;\n    if (blocked.some(b => host === b || host.endsWith('.' + b))) continue;\n    if (seen.has(host)) continue;\n    seen.add(host);\n    out.push({ json: {\n      company: (r.title || host).split(/[-|–—:]/)[0].trim(),\n      website: 'https://' + host,\n      domain: host,\n      snippet: r.snippet || '',\n      country: (sp.gl || '').toUpperCase(),\n      language: langMap[sp.hl] || 'English',\n      searchQuery: sp.q || ''\n    }});\n  }\n}\nreturn out;"
+      },
+      "id": "12ddb477-da36-46b6-b3e5-ce7dd9965e51",
+      "name": "Extract Candidates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw",
+          "mode": "list",
+          "cachedResultName": "LEAD AA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "964b0c56-b976-42d7-b3d8-6b3b5bb05b07",
+      "name": "Get Existing Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        112,
+        1872
+      ],
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Z5PK81iZkU92uSXr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const existing = new Set(\n  $('Get Existing Leads').all().map(i => (i.json.Domain || '').toLowerCase()).filter(Boolean)\n);\nconst max = $('Config').first().json.maxLeadsPerDay || 10;\nconst fresh = $('Extract Candidates').all().filter(i => !existing.has(i.json.domain));\n// round-robin across countries so every country gets a share\nconst groups = {};\nfresh.forEach(i => { (groups[i.json.country] = groups[i.json.country] || []).push(i); });\nconst keys = Object.keys(groups);\nconst out = [];\nlet added = true;\nwhile (out.length < max && added) {\n  added = false;\n  for (const k of keys) {\n    if (groups[k].length && out.length < max) { out.push(groups[k].shift()); added = true; }\n  }\n}\nreturn out;"
+      },
+      "id": "d1df345a-d72f-44d4-8fd5-78513a541dc6",
+      "name": "Filter New Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.website }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 2,
+              "batchInterval": 500
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "c9e31dee-0657-41bf-b3b7-727127e4f856",
+      "name": "Scrape Homepage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        1872
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const lead = $('Filter New Leads').item.json;\nconst html = typeof $json.data === 'string' ? $json.data : '';\nconst decoded = html.replace(/&#64;|&commat;|\\[at\\]/gi, '@');\nconst found = decoded.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/g) || [];\nconst bad = /\\.(png|jpe?g|gif|svg|webp|css|js|woff2?)$/i;\nconst junk = /(sentry|wixpress|example|domain\\.com|yourname|u003e|noreply|no-reply|donotreply)/i;\nconst clean = [...new Set(found.map(e => e.toLowerCase()))]\n  .filter(e => !bad.test(e) && !junk.test(e) && !e.endsWith('.ng'));\nconst same = clean.filter(e => {\n  const d = e.split('@')[1].replace(/^www\\./, '');\n  return d.endsWith(lead.domain) || lead.domain.endsWith(d);\n});\nconst pref = ['info','contact','hello','enquiries','enquiry','office','sales','admin','bookings','reception','contacto','bonjour'];\nconst rank = e => { const r = pref.indexOf(e.split('@')[0]); return r < 0 ? 99 : r; };\nsame.sort((a, b) => rank(a) - rank(b));\nconst pick = same[0];\nreturn { json: { ...lead, hasEmail: !!pick, contactEmail: pick || '', contactFirstName: '', contactLastName: '', contactPosition: '', organization: lead.company, emailSource: pick ? 'website' : '' } };"
+      },
+      "id": "5c7fb9fb-80df-461e-85ae-2f3d02f3c69f",
+      "name": "Extract Site Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        1872
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "8e81842c-c869-43e9-9056-32f76c31f5da",
+              "leftValue": "={{ $json.hasEmail }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2006dc59-174a-48c6-85a2-af622b63bfe0",
+      "name": "Site Email Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        1872
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "87765ddf-aa13-4304-88c6-6006f7d3e609",
+      "name": "Lead Ready",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        1808
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are an expert B2B cold email copywriter. You write short, honest, personalised emails that sound human, in the language requested. Always reply with JSON only.",
+              "role": "system"
+            },
+            {
+              "content": "={{ (() => {\nconst c = $('Config').first().json;\nconst l = $json;\nreturn 'Write a cold outreach email in ' + l.language + ' to ' + (l.contactFirstName || 'the team') + ' at ' + l.organization + ' (website: ' + l.website + ', country: ' + l.country + '). Business type we searched for: ' + l.searchQuery + '. Context from their Google listing: ' + l.snippet + '\\n\\nMy name: ' + c.yourName + '\\nMy company: ' + c.yourCompany + '\\nWhat we offer: ' + c.yourOffer + '\\n\\nRules: write the subject and body in ' + l.language + '. Under 110 words, plain text, friendly and specific to their type of business. Mention one or two realistic automation ideas relevant to that business type (for example booking reminders, enquiry replies, lead follow-up, invoicing). ONE clear low-pressure call to action (a short reply or a 15-minute call). Do not invent facts, results, clients or numbers. No hype, no emojis. End with one short opt-out line (in ' + l.language + ') saying they can reply \"no thanks\" and you will not email again. Sign off with my name and company.\\n\\nReturn ONLY valid JSON in this exact shape: {\"subject\": \"...\", \"body\": \"...\"}';\n})() }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 700,
+          "temperature": 0.7
+        }
+      },
+      "id": "94078ac8-1fee-4cc2-8e08-69d7d0fd29aa",
+      "name": "Write Cold Email (OpenAI)",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.1,
+      "position": [
+        2000,
+        1808
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const lead = $('Lead Ready').item.json;\nconst j = $json;\nlet c = (j.message && j.message.content) || (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || j.text || (j.output && j.output[0] && j.output[0].content && j.output[0].content[0] && j.output[0].content[0].text) || j.content || '';\nlet mail;\nif (c && typeof c === 'object' && !Array.isArray(c)) {\n  mail = c;\n} else {\n  const raw = typeof c === 'string' ? c : JSON.stringify(c);\n  const m = raw.match(/\\{[\\s\\S]*\\}/);\n  if (!m) throw new Error('The AI did not return JSON for ' + lead.domain + ': ' + raw.slice(0, 200));\n  mail = JSON.parse(m[0]);\n}\nif (!mail.subject || !mail.body) throw new Error('Missing subject or body for ' + lead.domain);\nreturn { json: { ...lead, subject: mail.subject, body: mail.body } };"
+      },
+      "id": "fc356bc8-a20a-486d-9769-04e3bb4f326c",
+      "name": "Parse Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        1808
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.contactEmail }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "38132a93-7075-4ea7-b458-b5b814e92bb4",
+      "name": "Send Cold Email (Gmail)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2528,
+        1808
+      ],
+      "webhookId": "33f5bd62-65f6-46f7-8b45-2aa42d25cc33",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UX63JLjEZGZg74R5",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw",
+          "mode": "list",
+          "cachedResultName": "LEAD AA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.toFormat('yyyy-MM-dd HH:mm') }}",
+            "Company": "={{ $('Parse Email').item.json.organization }}",
+            "Website": "={{ $('Parse Email').item.json.website }}",
+            "Domain": "={{ $('Parse Email').item.json.domain }}",
+            "Country": "={{ $('Parse Email').item.json.country }}",
+            "Contact Name": "={{ ($('Parse Email').item.json.contactFirstName + ' ' + $('Parse Email').item.json.contactLastName).trim() }}",
+            "Contact Email": "={{ $('Parse Email').item.json.contactEmail }}",
+            "Position": "={{ $('Parse Email').item.json.contactPosition }}",
+            "Subject": "={{ $('Parse Email').item.json.subject }}",
+            "Email Body": "={{ $('Parse Email').item.json.body }}",
+            "Email Source": "={{ $('Parse Email').item.json.emailSource }}",
+            "Status": "={{ $json.id ? 'Email sent' : 'Send failed' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Email",
+              "displayName": "Contact Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Body",
+              "displayName": "Email Body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Source",
+              "displayName": "Email Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "deab2086-e613-4bae-ab2b-16a337e354d1",
+      "name": "Log Sent Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2752,
+        1808
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Z5PK81iZkU92uSXr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.website.replace(/\\/$/, '') + '/contact' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 2,
+              "batchInterval": 500
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "e508e1af-695f-4a90-b905-9346d8f851b3",
+      "name": "Scrape Contact Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1216,
+        2032
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const lead = $('Extract Site Email').item.json;\nconst html = typeof $json.data === 'string' ? $json.data : '';\nconst decoded = html.replace(/&#64;|&commat;|\\[at\\]/gi, '@');\nconst found = decoded.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/g) || [];\nconst bad = /\\.(png|jpe?g|gif|svg|webp|css|js|woff2?)$/i;\nconst junk = /(sentry|wixpress|example|domain\\.com|yourname|u003e|noreply|no-reply|donotreply)/i;\nconst clean = [...new Set(found.map(e => e.toLowerCase()))]\n  .filter(e => !bad.test(e) && !junk.test(e) && !e.endsWith('.ng'));\nconst same = clean.filter(e => {\n  const d = e.split('@')[1].replace(/^www\\./, '');\n  return d.endsWith(lead.domain) || lead.domain.endsWith(d);\n});\nconst pref = ['info','contact','hello','enquiries','enquiry','office','sales','admin','bookings','reception','contacto','bonjour'];\nconst rank = e => { const r = pref.indexOf(e.split('@')[0]); return r < 0 ? 99 : r; };\nsame.sort((a, b) => rank(a) - rank(b));\nconst pick = same[0];\nreturn { json: { ...lead, hasEmail: !!pick, contactEmail: pick || '', contactFirstName: '', contactLastName: '', contactPosition: '', organization: lead.company, emailSource: pick ? 'contact page' : '' } };"
+      },
+      "id": "f375179a-7e69-4be1-8532-d38d5e8c0497",
+      "name": "Extract Contact Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "34914bac-a931-47e4-b6b7-afeac76b85df",
+              "leftValue": "={{ $json.hasEmail }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "bceeae30-96cb-4550-b86f-f02a4d3195a7",
+      "name": "Contact Email Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw",
+          "mode": "list",
+          "cachedResultName": "LEAD AA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBeh9qNpaonFCa0wg3p2CIwFodMLjxzZApiLTbNqKXw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.toFormat('yyyy-MM-dd HH:mm') }}",
+            "Company": "={{ $json.organization }}",
+            "Website": "={{ $json.website }}",
+            "Domain": "={{ $json.domain }}",
+            "Country": "={{ $json.country }}",
+            "Contact Name": "",
+            "Contact Email": "",
+            "Position": "",
+            "Subject": "",
+            "Email Body": "",
+            "Email Source": "",
+            "Status": "No email found"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Email",
+              "displayName": "Contact Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Body",
+              "displayName": "Email Body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Source",
+              "displayName": "Email Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "348f1fc7-9287-4520-979d-37219a8f8173",
+      "name": "Log No-Email Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1872,
+        2208
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Z5PK81iZkU92uSXr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "bbc251c7-0c4e-4f9f-af61-c84d0585c5f6",
+      "name": "Merge Results",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        2976,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst sent = rows.filter(r => r.Status === 'Email sent');\nconst failed = rows.filter(r => r.Status === 'Send failed');\nconst none = rows.filter(r => r.Status === 'No email found');\nconst date = $now.toFormat('dd LLL yyyy');\nlet msg = 'Oveza lead report - ' + date + '\\n\\n';\nmsg += 'Cold emails sent: ' + sent.length + '\\n';\nif (failed.length) msg += 'Send failed: ' + failed.length + '\\n';\nmsg += 'Leads with no email found: ' + none.length + '\\n';\nif (sent.length) {\n  msg += '\\nSent to:\\n';\n  sent.forEach((r, i) => { msg += (i + 1) + '. ' + r.Company + ' [' + r.Country + '] - ' + r['Contact Email'] + ' (' + r.Website + ')\\n'; });\n}\nmsg += '\\nAll leads are logged in your Google Sheet.';\nreturn [{ json: { message: msg, subject: 'Oveza lead report ' + date + ': ' + sent.length + ' emails sent' } }];"
+      },
+      "id": "3c533a5a-60b4-4461-8724-17f733dd305e",
+      "name": "Build Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3184,
+        1968
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config').first().json.notifyEmail }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.message }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "63626919-f710-433f-ad5d-4887b8075e03",
+      "name": "Notify Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3408,
+        2080
+      ],
+      "webhookId": "b7f08728-c77c-4b4f-81b2-fb56e28403bf",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "UX63JLjEZGZg74R5",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule 7AM": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Search Web (Serper)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Web (Serper)": {
+      "main": [
+        [
+          {
+            "node": "Extract Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Candidates": {
+      "main": [
+        [
+          {
+            "node": "Get Existing Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Leads": {
+      "main": [
+        [
+          {
+            "node": "Filter New Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Leads": {
+      "main": [
+        [
+          {
+            "node": "Scrape Homepage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Homepage": {
+      "main": [
+        [
+          {
+            "node": "Extract Site Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Site Email": {
+      "main": [
+        [
+          {
+            "node": "Site Email Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Site Email Found?": {
+      "main": [
+        [
+          {
+            "node": "Lead Ready",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scrape Contact Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Ready": {
+      "main": [
+        [
+          {
+            "node": "Write Cold Email (OpenAI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Cold Email (OpenAI)": {
+      "main": [
+        [
+          {
+            "node": "Parse Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Email": {
+      "main": [
+        [
+          {
+            "node": "Send Cold Email (Gmail)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Cold Email (Gmail)": {
+      "main": [
+        [
+          {
+            "node": "Log Sent Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Sent Lead": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Contact Page": {
+      "main": [
+        [
+          {
+            "node": "Extract Contact Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Contact Email": {
+      "main": [
+        [
+          {
+            "node": "Contact Email Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Email Found?": {
+      "main": [
+        [
+          {
+            "node": "Lead Ready",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log No-Email Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log No-Email Lead": {
+      "main": [
+        [
+          {
+            "node": "Merge Results",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Results": {
+      "main": [
+        [
+          {
+            "node": "Build Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Summary": {
+      "main": [
+        [
+          {
+            "node": "Notify Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f98a4674-85d3-4557-9fd0-a9ac38c6f9b6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b23df21297e6263a4f493051f0773cb9f2bb6babb27a47e42188970fa11ac532"
+  },
+  "nodeGroups": [],
+  "id": "NC1GjeXCrMPzftYt",
+  "tags": []
+}
